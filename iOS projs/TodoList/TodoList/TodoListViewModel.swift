@@ -7,25 +7,39 @@
 
 import Foundation
 
-struct ToDo: Hashable {
-    let title: String
+struct ToDo: Identifiable {
+    let id = UUID()
+    var title: String
     var description: String
+    
+    mutating func update(title: String, description: String) {
+        self.title = title
+        self.description = description
+    }
 }
 
 class TodoListViewModel: ObservableObject {
     
     @Published var todos = [ToDo]()
-    var old_todo: ToDo = ToDo(title: "", description: "")
+    var updateTodo = false
+    var selectedTodo: ToDo?
     
     func addTodo(_ todo: ToDo) {
         todos.append(todo)
     }
     
-    func updateTodo(_ text: String) {
-        for i in 0..<todos.count {
-            if todos[i] == old_todo {
-                todos[i].description = text
-            }
+    func updateSelectedTodo(title: String, description: String) {
+        if let index = todos.firstIndex(where: {
+            $0.id == selectedTodo?.id
+        }) {
+            todos[index].update(title: title, description: description)
+        }
+    }
+    
+    func delete(_ todo: ToDo) {
+        if let index = todos.firstIndex(where: {
+            $0.id == todo.id}) {
+            todos.remove(at: index)
         }
     }
     

@@ -7,51 +7,54 @@
 
 import SwiftUI
 
+
+
+
 struct ContentView: View {
     
     @StateObject var viewModel = TodoListViewModel()
     @State var presentSheet = false
-    @State var presentUpdate = false
     
     var body: some View {
         NavigationView(){
             VStack {
-                List(viewModel.todos, id: \.self) { item in
-                    NavigationLink(destination: {
-                        VStack {
-                            Text(item.description)
-                        }
-                        .navigationBarItems(trailing: Button(action: {
-                            presentUpdate.toggle()
-                        }, label: {
-                            Image(systemName: "elipsis.circle")
-                        }))
-                        .sheet(isPresented: $presentUpdate) {
-                            UpdateItemView(view_model: viewModel, present_sheet: $presentUpdate)
-                        }
-                    })
-                    { HStack {
+                List(viewModel.todos) { item in
+                    NavigationLink{
+                        detailsView(item)
+                    } label: {
                         Text(item.title)
-                    }
                     }
                 }
             }
+            .navigationTitle("Todo's")
+            .navigationBarItems(trailing: Button(action: {
+                presentSheet.toggle()
+            }, label: {
+                Image(systemName: "plus")
+            }))
+            .sheet(isPresented: $presentSheet) {
+                AddItemView(presentSheet: $presentSheet, viewModel: viewModel)
+            }
         }
-        .navigationTitle("Todo's")
-        .navigationBarItems(trailing: Button(action: {
-            presentSheet.toggle()
-        }, label: {
-            Image(systemName: "plus")
-        }))
-        .sheet(isPresented: $presentSheet) {
-            AddItemView(presentSheet: $presentSheet,
-                        viewModel: viewModel)
+    }
+    
+    private func detailsView(_ item: ToDo) -> some View {
+        VStack {
+            Text(item.description)
+            Button("Update") {
+                viewModel.selectedTodo = item
+                viewModel.updateTodo.toggle()
+                presentSheet.toggle()
+            }
+            padding()
+                .background(.cyan)
+                .cornerRadius(10)
         }
     }
 }
-        
-        //        struct ContentView_Previews: PreviewProvider {
-        //            static var previews: some View {
-        //                ContentView()
-        //            }
-        //        }
+    
+    //        struct ContentView_Previews: PreviewProvider {
+    //            static var previews: some View {
+    //                ContentView()
+    //            }
+    //        }

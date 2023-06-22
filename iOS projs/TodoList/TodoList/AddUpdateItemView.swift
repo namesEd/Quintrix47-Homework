@@ -8,21 +8,29 @@
 import SwiftUI
 
 struct UpdateItemView: View {
+    
+    @State var title: String = ""
     @State var description: String = ""
+    @Binding var present_sheet: Bool
     
     @ObservedObject var view_model: TodoListViewModel
-    @Binding var old_todo: ToDo
-    @Binding var present_sheet: Bool
+
     
     var body: some View {
         VStack {
+            TextField("Title", text: $title)
             TextField("Description", text: $description)
+            
             Spacer()
             Button() {
-                view_model.updateTodo(old_todo, description)
+                if view_model.updateTodo {
+                    view_model.updateSelectedTodo(title: title, description: description)
+                } else {
+                    view_model.addTodo(ToDo(title: title, description: description))
+                }
                 present_sheet.toggle()
             } label: {
-                Text("Update")
+                Text(view_model.updateTodo ? "Update" : "Add")
             }
         }
         .padding()
