@@ -9,9 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State var searchText = "Titanic"
-    
-    //let datasource: [Movie] = [Movie.mock]
-    
     @StateObject var viewModel = MoviesViewModel()
     
     var body: some View {
@@ -34,7 +31,7 @@ struct ContentView: View {
     private func listView() -> some View {
         List(viewModel.movies) { movie in
             NavigationLink {
-                Text(movie.title)
+                MovieDetailsView(viewModel: MovieDetailsViewModel(movie: movie))
             } label: {
                 MovieCell(movie: movie)
             }
